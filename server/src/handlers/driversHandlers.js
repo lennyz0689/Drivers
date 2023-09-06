@@ -1,23 +1,38 @@
-const { createDriver } = require("../controllers/driversControllers")
+const { createDriver, searchDriver, getAllDrivers, getDriverName } = require("../controllers/driversControllers")
 
-const getHandlerDrivers = (req, res, next) => {
+const getHandlerDrivers = async (req, res) => {
     const { name } = req.query
-    if (name === undefined) {
-        res.status(200).send('este endpoint es para los Drivers')
-    }
-    else {
-        res.status(200).send(`informacion del nombre ${name}`)
-    }
-}
-
-const getHandlerDriverid = (req, res, next) => {
-    const { id } = req.params
-    res.status(200).send(`esta es el detalle de Driver con el id ${id}`)
-}
-
-const postHandlerDriver = async (req, res, next) => {
     try {
-        const { name, lastName, description, image, nationality, datebirth } = req.body
+        if (name === undefined) {
+            res.status(200).json(await getAllDrivers())
+        }
+        else {
+            res.status(200).json(await getDriverName(name))
+        }
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
+const getHandlerDriverid = async (req, res) => {
+    const { id } = req.params
+    let type = ''
+    if (isNaN(id)) {
+        type = 'database'
+    } else {
+        type = 'api'
+    }
+    try {
+        const driver = await searchDriver(id, type)
+        res.status(200).json(driver)
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
+const postHandlerDriver = async (req, res) => {
+    const { name, lastName, description, image, nationality, datebirth } = req.body
+    try {
         const newDriver = await createDriver(name, lastName, description, image, nationality, datebirth)
         res.status(201).json(newDriver)
     } catch (error) {

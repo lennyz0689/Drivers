@@ -1,8 +1,7 @@
 const { Router } = require('express')
+const { postHandlerTeams } = require('../handlers/teamsHandlers')
 const teamsRouter = Router()
 
-teamsRouter.get('/', (req, res, next)=>{
-    res.status(200).send('este endpoint es para los teams')
-})
+teamsRouter.post('/', postHandlerTeams)
 
 module.exports = teamsRouter
